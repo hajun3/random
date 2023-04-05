@@ -1,63 +1,67 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Group Generator</title>
-</head>
-<body>
-  <h1>Group Generator</h1>
-  <p>Enter the names of the people to be grouped:</p>
-  <ul id="name-list"></ul>
-  <input type="text" id="name-input">
-  <button onclick="addName()">Add Name</button>
-  <button onclick="generateGroups()">Generate Groups</button>
-  <p>Groups:</p>
-  <ul id="group-list"></ul>
-  
-  <script>
-    var names = [];
-
-    function addName() {
-      var nameInput = document.getElementById("name-input");
-      var name = nameInput.value.trim();
-      if (name !== "") {
-        names.push(name);
-        var nameList = document.getElementById("name-list");
-        var listItem = document.createElement("li");
-        listItem.textContent = name;
-        nameList.appendChild(listItem);
-        nameInput.value = "";
-      }
-    }
-
-    function generateGroups() {
-      var groups = [];
-      var namesCopy = names.slice();  // copy names array to avoid modifying original
-      while (namesCopy.length > 0) {
-        var group = [];
-        if (namesCopy.length === 1) {
-          group.push(namesCopy.pop());
-        } else if (namesCopy.length === 2) {
-          group.push(namesCopy.pop(), namesCopy.pop());
-        } else {
-          group.push(namesCopy.pop(), namesCopy.pop(), namesCopy.pop());
+  <head>
+    <meta charset="UTF-8">
+    <title>Group of Three People</title>
+  </head>
+  <body>
+    <h1>Group of Three People</h1>
+    
+    <p>Enter the list of people:</p>
+    <textarea id="input" rows="10" cols="50"></textarea>
+    
+    <p>Groups:</p>
+    <ul id="output"></ul>
+    
+    <button onclick="groupPeople()">Group</button>
+    
+    <script>
+      function groupPeople() {
+        // Get the input text and split it into an array
+        var inputText = document.getElementById("input").value;
+        var people = inputText.trim().split("\n");
+        
+        // Shuffle the array randomly
+        shuffleArray(people);
+        
+        // Group the people into groups of three
+        var groups = [];
+        while (people.length > 0) {
+          if (people.length >= 3) {
+            groups.push([people.shift(), people.shift(), people.shift()]);
+          } else {
+            groups.push(people.slice());
+            people = [];
+          }
         }
-        groups.push(group);
-        // rotate names to promote variety in future groups
-        namesCopy.push(namesCopy.shift());
+        
+        // Sort each group by the number in parentheses
+        groups.forEach(function(group) {
+          group.sort(function(a, b) {
+            var aNum = parseInt(a.match(/\((\d+)\)/)[1]);
+            var bNum = parseInt(b.match(/\((\d+)\)/)[1]);
+            return aNum - bNum;
+          });
+        });
+        
+        // Display the groups in the output list
+        var outputList = document.getElementById("output");
+        outputList.innerHTML = "";
+        groups.forEach(function(group) {
+          var listItem = document.createElement("li");
+          listItem.textContent = group.join(", ");
+          outputList.appendChild(listItem);
+        });
       }
-      displayGroups(groups);
-    }
-
-    function displayGroups(groups) {
-      var groupList = document.getElementById("group-list");
-      groupList.innerHTML = "";
-      for (var i = 0; i < groups.length; i++) {
-        var groupItem = document.createElement("li");
-        groupItem.textContent = "Group " + (i+1) + ": " + groups[i].join(", ");
-        groupList.appendChild(groupItem);
+      
+      function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = array[i];
+          array[i] = array[j];
+          array[j] = temp;
+        }
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
